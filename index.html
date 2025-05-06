@@ -58,82 +58,87 @@
 <p>Brands offering this category:</p>
 <ul id="brand-results"></ul>
 
-    <script>
-        const searchButton = document.getElementById('search');
-        const brandInput = document.getElementById('brand');
-        const productTypeInput = document.getElementById('productType');
-        const resultCount = document.getElementById('result-count');
-        const resultsDiv = document.getElementById('results');
+<script>
+    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
 
-        searchButton.addEventListener('click', function() {
-            const brand = brandInput.value.trim().toLowerCase();
-            const type = productTypeInput.value.trim().toLowerCase();
+    const searchButton = document.getElementById('search');
+    const brandInput = document.getElementById('brand');
+    const productTypeInput = document.getElementById('productType');
+    const resultCount = document.getElementById('result-count');
+    const resultsDiv = document.getElementById('results');
 
-            const requestUrl = `http://makeup-api.herokuapp.com/api/v1/products.json?brand=${brand}&product_type=${type}`;
+    searchButton.addEventListener('click', function() {
+        const brand = brandInput.value.trim().toLowerCase();
+        const type = productTypeInput.value.trim().toLowerCase();
+
+        const apiUrl = `http://makeup-api.herokuapp.com/api/v1/products.json?brand=${brand}&product_type=${type}`;
+        const requestUrl = proxyUrl + apiUrl;
+
+        fetch(requestUrl)
+            .then(response => response.json())
+            .then(data => {
+                console.log("API Response:", data);
+
+                resultCount.textContent = data.length;
+                resultsDiv.innerHTML = "";
+
+                data.forEach(product => {
+                    const productDiv = document.createElement('div');
+
+                    const nameP = document.createElement('p');
+                    nameP.textContent = product.name;
+                    productDiv.appendChild(nameP);
+
+                    if (product.image_link) {
+                        const img = document.createElement('img');
+                        img.src = product.image_link;
+                        img.alt = product.name;
+                        img.width = 150;
+                        productDiv.appendChild(img);
+                    }
+
+                    resultsDiv.appendChild(productDiv);
+                });
+            })
+            .catch(error => {
+                console.error("Fetch error:", error);
+                alert("Something went wrong. Check console.");
+            });
+    });
+
+    const tagButtons = document.querySelectorAll('.tag-btn');
+    const brandResults = document.getElementById('brand-results');
+
+    tagButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const tag = this.dataset.tag;
+            const apiUrl = `http://makeup-api.herokuapp.com/api/v1/products.json?product_tags=${tag}`;
+            const requestUrl = proxyUrl + apiUrl;
 
             fetch(requestUrl)
                 .then(response => response.json())
                 .then(data => {
-                    console.log("API Response:", data);
+                    const brands = [...new Set(data.map(product => product.brand).filter(Boolean))];
+                    brandResults.innerHTML = "";
 
-                    resultCount.textContent = data.length;
-                    resultsDiv.innerHTML = "";
-
-                    data.forEach(product => {
-                        const productDiv = document.createElement('div');
-
-                        const nameP = document.createElement('p');
-                        nameP.textContent = product.name;
-                        productDiv.appendChild(nameP);
-
-                        if (product.image_link) {
-                            const img = document.createElement('img');
-                            img.src = product.image_link;
-                            img.alt = product.name;
-                            img.width = 150;
-                            productDiv.appendChild(img);
-                        }
-
-                        resultsDiv.appendChild(productDiv);
-                    });
+                    if (brands.length === 0) {
+                        brandResults.innerHTML = "<li>No brands found for this tag.</li>";
+                    } else {
+                        brands.forEach(brand => {
+                            const li = document.createElement('li');
+                            li.textContent = brand.charAt(0).toUpperCase() + brand.slice(1);
+                            brandResults.appendChild(li);
+                        });
+                    }
                 })
                 .catch(error => {
                     console.error("Fetch error:", error);
-                    alert("Something went wrong. Check console.");
+                    brandResults.innerHTML = "<li>Error fetching data.</li>";
                 });
         });
+    });
+</script>
 
-        const tagButtons = document.querySelectorAll('.tag-btn');
-        const brandResults = document.getElementById('brand-results');
-
-        tagButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const tag = this.dataset.tag;
-            const requestUrl = `http://makeup-api.herokuapp.com/api/v1/products.json?product_tags=${tag}`;
-
-            fetch(requestUrl)
-            .then(response => response.json())
-            .then(data => {
-                const brands = [...new Set(data.map(product => product.brand).filter(Boolean))]; // unique non-null brands
-                brandResults.innerHTML = ""; // clear previous
-
-                if (brands.length === 0) {
-                brandResults.innerHTML = "<li>No brands found for this tag.</li>";
-                } else {
-                brands.forEach(brand => {
-                    const li = document.createElement('li');
-                    li.textContent = brand.charAt(0).toUpperCase() + brand.slice(1);
-                    brandResults.appendChild(li);
-                });
-                }
-            })
-            .catch(error => {
-                console.error("Fetch error:", error);
-                brandResults.innerHTML = "<li>Error fetching data.</li>";
-            });
-        });
-        });
-    </script>
 
 </body>
 </html>
