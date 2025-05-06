@@ -126,3 +126,9 @@ section h2 {
   .hero p {
     color: black;
   }
+  .site-footer {
+    background-color: #800080; /* same purple as nav bar */
+    color: white;
+    text-align: center;
+    padding: 20px;
+  }
