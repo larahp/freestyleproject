@@ -3,142 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <title>Makeup Product Finder</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        #results div { border: 1px solid #ccc; padding: 10px; margin: 10px 0; display: inline-block; vertical-align: top; width: 160px; }
-        img { display: block; margin-top: 5px; }
-    </style>
+    <link rel="stylesheet" href="style.css"> <!-- your external stylesheet -->
 </head>
 <body>
 
-    <h1>Makeup Product Finder</h1>
-    <h2>Discover Brands & Products</h2>
-    <label for="brand">Select Brand:</label>
-<select id="brand">
-    <option value="" disabled selected>-- Select Brand --</option>
-    <option value="almay">Almay</option>
-    <option value="clinique">Clinique</option>
-    <option value="covergirl">Covergirl</option>
-    <option value="elf">e.l.f.</option>
-    <option value="glossier">Glossier</option>
-    <option value="loreal">L'Oreal</option>
-    <option value="maybelline">Maybelline</option>
-    <option value="nyx">NYX</option>
-    <option value="revlon">Revlon</option>
-</select>
+    <!-- Navbar -->
+    <nav>
+        <div class="nav-container">
+          <div class="logo">
+            <img src="images/logo.png" alt="MakeupFinder Logo" style="height:40px;">
+          </div>
+          <ul class="nav-links">
+            <li><a href="#find-products">Find Products</a></li>
+            <li><a href="#explore-brands">Explore Brands</a></li>
+          </ul>
+        </div>
+      </nav>
+      
 
-<label for="productType">Select Product Type:</label>
-<select id="productType">
-    <option value="" disabled selected>-- Select Product Type --</option>
-    <option value="blush">Blush</option>
-    <option value="bronzer">Bronzer</option>
-    <option value="eyebrow">Eyebrow</option>
-    <option value="eyeliner">Eyeliner</option>
-    <option value="eyeshadow">Eyeshadow</option>
-    <option value="foundation">Foundation</option>
-    <option value="lip_liner">Lip Liner</option>
-    <option value="lipstick">Lipstick</option>
-    <option value="mascara">Mascara</option>
-</select>
+    <!-- Hero -->
+    <header class="hero">
+      <h1>Discover Makeup Products & Brands</h1>
+      <p>Search for your favorite makeup brands and products, or explore brands by product tags.</p>
+    </header>
 
-    <button id="search">Search</button>
+    <!-- Product Finder Section -->
+    <section id="find-products">
+      <h2>Find Products</h2>
+      <label for="brand">Select Brand:</label>
+      <select id="brand">
+        <option value="" disabled selected>-- Select Brand --</option>
+        <option value="almay">Almay</option>
+        <option value="clinique">Clinique</option>
+        <option value="covergirl">Covergirl</option>
+        <option value="elf">e.l.f.</option>
+        <option value="loreal">L'Oreal</option>
+        <option value="maybelline">Maybelline</option>
+        <option value="nyx">NYX</option>
+        <option value="revlon">Revlon</option>
+      </select>
 
-    <p>Results: <span id="result-count">0</span> products found</p>
-    <div id="results"></div>
+      <label for="productType">Select Product Type:</label>
+      <select id="productType">
+        <option value="" disabled selected>-- Select Product Type --</option>
+        <option value="blush">Blush</option>
+        <option value="bronzer">Bronzer</option>
+        <option value="eyebrow">Eyebrow</option>
+        <option value="eyeliner">Eyeliner</option>
+        <option value="eyeshadow">Eyeshadow</option>
+        <option value="foundation">Foundation</option>
+        <option value="lip_liner">Lip Liner</option>
+        <option value="lipstick">Lipstick</option>
+        <option value="mascara">Mascara</option>
+      </select>
 
-    <h2>Explore Brands by Product Tag</h2>
-<div id="tag-container">
-  <button class="tag-btn" data-tag="vegan">Vegan</button>
-  <button class="tag-btn" data-tag="cruelty+free">Cruelty Free</button>
-  <button class="tag-btn" data-tag="natural">Natural</button>
-  <button class="tag-btn" data-tag="organic">Organic</button>
-  <!-- Add more tags as needed -->
-</div>
+      <button id="search">Search</button>
+      <p>Results: <span id="result-count">0</span> products found</p>
+      <div id="results"></div>
+    </section>
 
-<p>Brands offering this category:</p>
-<ul id="brand-results"></ul>
+    <!-- Explore Brands Section -->
+    <section id="explore-brands">
+      <h2>Explore Brands by Product Tag</h2>
+      <div id="tag-container">
+        <button class="tag-btn" data-tag="vegan">Vegan</button>
+        <button class="tag-btn" data-tag="cruelty+free">Cruelty Free</button>
+        <button class="tag-btn" data-tag="natural">Natural</button>
+        <button class="tag-btn" data-tag="organic">Organic</button>
+      </div>
+      <p>Brands offering this category:</p>
+      <ul id="brand-results"></ul>
+    </section>
 
-<script>
-    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+    <script>
+      const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+      const searchButton = document.getElementById('search');
+      const brandInput = document.getElementById('brand');
+      const productTypeInput = document.getElementById('productType');
+      const resultCount = document.getElementById('result-count');
+      const resultsDiv = document.getElementById('results');
 
-    const searchButton = document.getElementById('search');
-    const brandInput = document.getElementById('brand');
-    const productTypeInput = document.getElementById('productType');
-    const resultCount = document.getElementById('result-count');
-    const resultsDiv = document.getElementById('results');
+      searchButton.addEventListener('click', function() {
+          const brand = brandInput.value.trim().toLowerCase();
+          const type = productTypeInput.value.trim().toLowerCase();
 
-    searchButton.addEventListener('click', function() {
-        const brand = brandInput.value.trim().toLowerCase();
-        const type = productTypeInput.value.trim().toLowerCase();
+          const apiUrl = `http://makeup-api.herokuapp.com/api/v1/products.json?brand=${brand}&product_type=${type}`;
+          const requestUrl = proxyUrl + apiUrl;
 
-        const apiUrl = `http://makeup-api.herokuapp.com/api/v1/products.json?brand=${brand}&product_type=${type}`;
-        const requestUrl = proxyUrl + apiUrl;
+          fetch(requestUrl)
+              .then(response => response.json())
+              .then(data => {
+                  console.log("API Response:", data);
+                  resultCount.textContent = data.length;
+                  resultsDiv.innerHTML = "";
 
-        fetch(requestUrl)
-            .then(response => response.json())
-            .then(data => {
-                console.log("API Response:", data);
+                  data.forEach(product => {
+                      const productDiv = document.createElement('div');
+                      const nameP = document.createElement('p');
+                      nameP.textContent = product.name;
+                      productDiv.appendChild(nameP);
 
-                resultCount.textContent = data.length;
-                resultsDiv.innerHTML = "";
+                      if (product.image_link) {
+                          const img = document.createElement('img');
+                          img.src = product.image_link;
+                          img.alt = product.name;
+                          img.width = 150;
+                          productDiv.appendChild(img);
+                      }
 
-                data.forEach(product => {
-                    const productDiv = document.createElement('div');
+                      resultsDiv.appendChild(productDiv);
+                  });
+              })
+              .catch(error => {
+                  console.error("Fetch error:", error);
+                  alert("Something went wrong. Check console.");
+              });
+      });
 
-                    const nameP = document.createElement('p');
-                    nameP.textContent = product.name;
-                    productDiv.appendChild(nameP);
+      const tagButtons = document.querySelectorAll('.tag-btn');
+      const brandResults = document.getElementById('brand-results');
 
-                    if (product.image_link) {
-                        const img = document.createElement('img');
-                        img.src = product.image_link;
-                        img.alt = product.name;
-                        img.width = 150;
-                        productDiv.appendChild(img);
-                    }
+      tagButtons.forEach(button => {
+          button.addEventListener('click', function() {
+              const tag = this.dataset.tag;
+              const apiUrl = `http://makeup-api.herokuapp.com/api/v1/products.json?product_tags=${tag}`;
+              const requestUrl = proxyUrl + apiUrl;
 
-                    resultsDiv.appendChild(productDiv);
-                });
-            })
-            .catch(error => {
-                console.error("Fetch error:", error);
-                alert("Something went wrong. Check console.");
-            });
-    });
+              fetch(requestUrl)
+                  .then(response => response.json())
+                  .then(data => {
+                      const brands = [...new Set(data.map(product => product.brand).filter(Boolean))];
+                      brandResults.innerHTML = "";
 
-    const tagButtons = document.querySelectorAll('.tag-btn');
-    const brandResults = document.getElementById('brand-results');
-
-    tagButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const tag = this.dataset.tag;
-            const apiUrl = `http://makeup-api.herokuapp.com/api/v1/products.json?product_tags=${tag}`;
-            const requestUrl = proxyUrl + apiUrl;
-
-            fetch(requestUrl)
-                .then(response => response.json())
-                .then(data => {
-                    const brands = [...new Set(data.map(product => product.brand).filter(Boolean))];
-                    brandResults.innerHTML = "";
-
-                    if (brands.length === 0) {
-                        brandResults.innerHTML = "<li>No brands found for this tag.</li>";
-                    } else {
-                        brands.forEach(brand => {
-                            const li = document.createElement('li');
-                            li.textContent = brand.charAt(0).toUpperCase() + brand.slice(1);
-                            brandResults.appendChild(li);
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error("Fetch error:", error);
-                    brandResults.innerHTML = "<li>Error fetching data.</li>";
-                });
-        });
-    });
-</script>
-
+                      if (brands.length === 0) {
+                          brandResults.innerHTML = "<li>No brands found for this tag.</li>";
+                      } else {
+                          brands.forEach(brand => {
+                              const li = document.createElement('li');
+                              li.textContent = brand.charAt(0).toUpperCase() + brand.slice(1);
+                              brandResults.appendChild(li);
+                          });
+                      }
+                  })
+                  .catch(error => {
+                      console.error("Fetch error:", error);
+                      brandResults.innerHTML = "<li>Error fetching data.</li>";
+                  });
+          });
+      });
+    </script>
 
 </body>
 </html>
