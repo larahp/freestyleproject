@@ -132,3 +132,22 @@ section h2 {
     text-align: center;
     padding: 20px;
   }
+  #tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .tag-btn {
+    background-color: #eee;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .tag-btn:hover {
+    background-color: #d1c4e9;
+  }

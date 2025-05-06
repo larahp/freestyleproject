@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Makeup Product Finder</title>
-    <link rel="stylesheet" href="style.css"> <!-- your external stylesheet -->
+    <link rel="stylesheet" href="style.css"> <!-- My external stylesheet was created with help from ChatGPT -->
 </head>
 <body>
 
-    <!-- Navbar -->
+    <!-- Navbar: Edits with help from ChatGPT -->
     <nav>
         <div class="nav-container">
           <div class="logo">
@@ -20,15 +20,15 @@
         </div>
       </nav>
       
-<!-- Hero -->
+<!-- Hero Section: Edits with help from ChatGPT; image was taken from https://wallpapers.com/cosmetics-background -->
       <header class="hero">
         <h1>Discover Makeup Products & Brands</h1>
         <p>Search for your favorite makeup brands and products, or explore brands by product tags.</p>
       </header>
 
-    <!-- Product Finder Section -->
+    <!-- Product Finder Section: Edits with help from ChatGPT -->
     <section id="find-products">
-      <h2>Find Products</h2>
+      <h2>Find Products by Brand</h2>
       <label for="brand">Select Brand:</label>
       <select id="brand">
         <option value="" disabled selected>-- Select Brand --</option>
@@ -57,26 +57,30 @@
       </select>
 
       <button id="search">Search</button>
-      <p>Results: <span id="result-count">0</span> products found</p>
+      <h4>Results: <span id="result-count">0</span> products found</h4>
       <div id="results"></div>
+      <button id="clear-results">Clear Results</button>
     </section>
 
-    <!-- Explore Brands Section -->
+    <!-- Explore Brands Section: Edits with help from ChatGPT -->
     <section id="explore-brands">
       <h2>Explore Brands by Product Tag</h2>
+      <p>Click on a tag to see brand names. </p>
       <div id="tag-container">
         <button class="tag-btn" data-tag="vegan">Vegan</button>
         <button class="tag-btn" data-tag="cruelty+free">Cruelty Free</button>
         <button class="tag-btn" data-tag="natural">Natural</button>
         <button class="tag-btn" data-tag="organic">Organic</button>
       </div>
-      <p>Brands offering this category:</p>
+      <h4>Selected Tag: <span id="selected-tag">None</span></h4>
+      <h4>Brands offering this category:</h4>
       <ul id="brand-results"></ul>
     </section>
     <footer class="site-footer">
       <p>OPAN-6541-40 -- Client-side Freestyle Project -- Lara Henriquez Pineda</p>
     </footer>
-
+    
+    <!-- JS Section: Built with help from online examples and ChatGPT -->
     <script>
       const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
       const searchButton = document.getElementById('search');
@@ -126,33 +130,43 @@
       const brandResults = document.getElementById('brand-results');
 
       tagButtons.forEach(button => {
-          button.addEventListener('click', function() {
-              const tag = this.dataset.tag;
-              const apiUrl = `http://makeup-api.herokuapp.com/api/v1/products.json?product_tags=${tag}`;
-              const requestUrl = proxyUrl + apiUrl;
+  button.addEventListener('click', function() {
+      const tag = this.dataset.tag;
 
-              fetch(requestUrl)
-                  .then(response => response.json())
-                  .then(data => {
-                      const brands = [...new Set(data.map(product => product.brand).filter(Boolean))];
-                      brandResults.innerHTML = "";
+      // ✅ Capitalize first letter for display
+      const formattedTag = tag.replace('+', ' ');
+      document.getElementById('selected-tag').textContent = formattedTag.charAt(0).toUpperCase() + formattedTag.slice(1);
 
-                      if (brands.length === 0) {
-                          brandResults.innerHTML = "<li>No brands found for this tag.</li>";
-                      } else {
-                          brands.forEach(brand => {
-                              const li = document.createElement('li');
-                              li.textContent = brand.charAt(0).toUpperCase() + brand.slice(1);
-                              brandResults.appendChild(li);
-                          });
-                      }
-                  })
-                  .catch(error => {
-                      console.error("Fetch error:", error);
-                      brandResults.innerHTML = "<li>Error fetching data.</li>";
+      const apiUrl = `http://makeup-api.herokuapp.com/api/v1/products.json?product_tags=${tag}`;
+      const requestUrl = proxyUrl + apiUrl;
+
+      fetch(requestUrl)
+          .then(response => response.json())
+          .then(data => {
+              const brands = [...new Set(data.map(product => product.brand).filter(Boolean))];
+              brandResults.innerHTML = "";
+
+              if (brands.length === 0) {
+                  brandResults.innerHTML = "<li>No brands found for this tag.</li>";
+              } else {
+                  brands.forEach(brand => {
+                      const li = document.createElement('li');
+                      li.textContent = brand.charAt(0).toUpperCase() + brand.slice(1);
+                      brandResults.appendChild(li);
                   });
+              }
+          })
+          .catch(error => {
+              console.error("Fetch error:", error);
+              brandResults.innerHTML = "<li>Error fetching data.</li>";
           });
-      });
+  });
+});
+      const clearButton = document.getElementById('clear-results');
+clearButton.addEventListener('click', function() {
+    resultsDiv.innerHTML = "";
+    resultCount.textContent = 0;
+});
     </script>
 
 </body>
