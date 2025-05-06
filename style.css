@@ -115,3 +115,14 @@ section h2 {
 #brand-results li {
     margin: 5px 0;
 }
+.hero {
+    background-image: url('Images/Background.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 100px 20px;
+    text-align: center;
+  }
+  
+  .hero p {
+    color: black;
+  }
